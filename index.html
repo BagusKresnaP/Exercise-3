@@ -1,0 +1,153 @@
+<html>
+    <head>
+        <title>Latihan 3</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <style>
+            .head_info { 
+                background-color: #63cca8;
+            }
+            .info { 
+                background-color: yellow;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 style="font-display: Helvetica; padding-left: 45cm;">Data Swapi</h2>
+        <div id="search">
+            <label for="filter">Filter</label> <input type="text" name="filter" value="" id="filter" />
+        </div>
+        <table class="table table-condensed">
+                <thead class="head_info">
+                    <th onclick="sortTable(0)" >name</th>
+                    <th onclick="sortTable(1)" >rotation_period</th>
+                    <th onclick="sortTable(2)" >orbital_period</th>
+                    <th onclick="sortTable(3)" >diameter</th>
+                    <th onclick="sortTable(4)" >climate</th>
+                    <th onclick="sortTable(5)" >gravity</th>
+                    <th onclick="sortTable(6)" >terrain</th>
+                    <th onclick="sortTable(7)" >surface_water</th>
+                    <th onclick="sortTable(8)" >population</th>
+                    <th onclick="sortTable(9)" >residents</th>
+                    <th onclick="sortTable(10)" >films</th>
+                    <th onclick="sortTable(11)" >created</th>
+                    <th onclick="sortTable(12)" >edited</th>
+                    <th onclick="sortTable(13)" >url</th>
+                </thead>
+                <tbody id="output"></tbody>
+        </table>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener("load", getPlanets);
+        function getPlanets(){
+            fetch(["https://swapi.co/api/planets/"])
+            .then((res)=> {return res.json()})
+            .then((data)=> {
+                let output = ``;
+                data.results.map(pl => {
+                    output += `
+                    <table class="table table-condensed" id="output">
+                        <tbody>
+                            <td class="info" name="name">${pl.name}</td>
+                            <td class="info" name="rotation_period">${pl.rotation_period}</td>
+                            <td class="info" name="orbital_period">${pl.orbital_period}</td>
+                            <td class="info" name="diameter">${pl.diameter}</td>
+                            <td class="info" name="climate">${pl.climate}</td>
+                            <td class="info" name="gravity">${pl.gravity}</td>
+                            <td class="info" name="terrain">${pl.terrain}</td>
+                            <td class="info" name="surface_water">${pl.surface_water}</td>
+                            <td class="info" name="population">${pl.population}</td>
+                            <td class="info" name="residents">${pl.residents}</td>
+                            <td class="info" name="films">${pl.films}</td>
+                            <td class="info" name="created">${pl.created}</td>
+                            <td class="info" name="edited">${pl.edited}</td>
+                            <td class="info" name="url">${pl.url}</td>
+                        </tbody>
+                    </table>
+                    `
+                });
+                document.getElementById("output").innerHTML = output;
+            })
+        }
+        function sortTable(n) { 
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("output");
+            switching = true;
+            //Sorting ascending:
+            dir = "asc"; 
+            //Looping
+            while (switching) {
+                //deklarasi switching (bagian mengatur asc dan desc sehingga data bisa terurut dan teracak seperti sebelumnya)
+                switching = false;
+                rows = table.rows;
+                /*Looping semua row tabel kecuali header tabel:*/
+                for (i = 0; i < (rows.length - 1); i++) {
+                //deklarasi shouldSwitch
+                shouldSwitch = false;
+                /*Mendapatkan dua elemen yang mau dicompare*/
+                x = rows[i].getElementsByTagName("td")[n];
+                y = rows[i + 1].getElementsByTagName("td")[n];
+                /*cek dua row tsb harus ditukar? */
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch= true;
+                    break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                    }
+                }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount ++;      
+                } else {
+                    /*Jika switching false dan masih "ascending",
+                    ubah "descending" dan looping kembali*/
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+        $(window).ready(function() { //fungsi filtering
+            $('#search').show();
+            
+            $('#filter').keyup(function(event) {
+                if (event.keyCode === 27 || $(this).val() === '') {
+                    //pengosongan nilai ketika pencet backspace
+                    $(this).val('');
+                    
+                    //visible karena tidak ada yang match dengan fungsi filter
+                    $('tbody td').removeClass('visible').show().addClass('visible');
+                }
+
+                //filter jika ada text
+                else {
+                    filter('tbody tr', $(this).val());
+                }
+            });
+        });
+
+        //filter hasil dari query
+        function filter(selector, query) {
+            query =	$.trim(query); //trim spasi
+            query = query.replace(/ /gi, '|'); //regular expression
+        
+            $(selector).each(function() {
+                ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+            });
+        }
+    </script>
+</html>
